@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Dave Merrills S3 Bucket CloudFormation Template
+
+Conditions:
+  HomeRegion: !Equals
+    - !Ref 'AWS::Region'
+    - us-west-2
+    -
+Resources:
+  DavidsS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !If
+        - HomeRegion
+        - !Join
+          - "-"
+          - - !Ref 'AWS::AccountId'
+            - david-merrills-bucket-accountid
+        - !Join
+          - "-"
+          - - !Ref 'AWS::Region'
+            - david-merrills-bucket-region
+      Tags:
+        - Key: Creator
+          Value: David Merrill
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true

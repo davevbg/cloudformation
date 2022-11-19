@@ -1,0 +1,31 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Dave Merrills S3 Bucket CloudFormation Json Template",
+  "Parameters": {
+    "BucketName": {
+      "Type": "String",
+      "Description": "The name of the S3 Bucket to create",
+      "Default": "david-merrills-json-bucket"
+    }
+  },
+  "Resources": {
+    "DavidsS3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": !Ref BucketName,
+        "Tags": [
+          {
+            "Key": "Creator",
+            "Value": "David Merrill"
+          }
+        ],
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
+        }
+      }
+    }
+  }
+}
