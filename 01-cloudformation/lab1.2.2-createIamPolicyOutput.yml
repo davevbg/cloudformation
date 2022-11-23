@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Dave Merrill Create IAM Managed policy
+
+###====RESOURCES====##
+Resources:
+  Lab2IAMPolicyDocument:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy Document for Read Only S3 Access
+      ManagedPolicyName: DavidMS3ReadOnlyAccess
+      Path: /
+      PolicyDocument:
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "AllowS3ReadOnlyAccess",
+              "Effect": "Allow",
+              "Action": [ "s3:GetObject",
+                          "s3:ListBucket"
+              ],
+              "Resource": "*"
+            }
+          ]
+        }
+      Users:
+        - 'davidmerrilllab'
+
+## ==== OUTPUT ====##
+Outputs:
+  outputArn:
+    Description: PolicyDocument Name
+    Value: !Ref Lab2IAMPolicyDocument
+    Export:
+      Name: Lab-1-2-PolicyName

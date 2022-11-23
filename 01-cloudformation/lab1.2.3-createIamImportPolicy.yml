@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Dave Merrill Create IAM User and Import Policy and Attach to User
+
+###====RESOURCES====##
+Resources:
+  Lab2IAMUser:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: davidmerrillimport
+      LoginProfile:
+        Password: Pa$$w0rd!
+        PasswordResetRequired: true
+      Path: '/'
+      ManagedPolicyArns:
+        [Fn::ImportValue: !Sub Lab-1-2-PolicyName]
