@@ -1,0 +1,21 @@
+##==== RECREATE BUCKET ====##
+aws s3api create-bucket \
+    --bucket stelligent-u-david.merrill.labs-2\
+    --region us-west-2 \
+    --profile labs-mfa \
+    --create-bucket-configuration LocationConstraint=us-west-2
+
+##==== CREATE S3 BUCKET POLICY PUBLIC READ ====##
+aws s3api put-bucket-policy \
+    --bucket stelligent-u-david.merrill.labs-2 \
+    --region us-west-2 \
+    --profile labs-mfa \
+    --policy file://david-merrill-bucket-policy.json
+
+##==== SET S3 ACL ON private.txt ====##
+aws s3api put-object-acl \
+    --acl private \
+    --bucket stelligent-u-david.merrill.labs-2 \
+    --key s3_lab_dir/privatefile.txt \
+    ---no-confirm-remove-self-bucket-access true \
+    --profile labs-mfa

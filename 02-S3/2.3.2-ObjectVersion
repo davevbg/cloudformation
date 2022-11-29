@@ -1,0 +1,8 @@
+##==== DELETE A VERSION OF THE VERSIONED FILE ====##
+aws s3api delete-object \
+    --bucket stelligent-u-david.merrill.labs \
+    --key uploadme.txt \
+    --version-id teLz7YqCmsmDv9jlzL4hr1XUfo_1LhMe \
+    --profile labs-mfa
+
+##==== file is not permanently deleted it has justed been marked as deleted ====##

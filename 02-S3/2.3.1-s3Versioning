@@ -1,0 +1,20 @@
+##==== CREATE S3BUCKET ====##
+aws s3api create-bucket \
+    --bucket stelligent-u-david.merrill.labs \
+    --profile labs-mfa
+
+##==== ENABLE VERSIONING ====#
+aws s3api put-bucket-versioning \
+    --bucket stelligent-u-david.merrill.labs \
+    --profile labs-mfa \
+    --versioning-configuration Status=Enabled
+
+##==== UPLOAD DIRECTORY ====##
+aws s3 sync s3_lab_dir s3://stelligent-u-david.merrill.labs \
+    --region us-west-2 \
+    --profile labs-mfa
+
+##==== RETRIEVE VERSIONING OF FILES ====##
+aws s3api list-object-versions \
+    --bucket stelligent-u-david.merrill.labs \
+    --profile labs-mfa

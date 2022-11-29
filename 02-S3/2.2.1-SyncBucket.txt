@@ -1,0 +1,4 @@
+##===== upload files using sync and include private file ====##
+aws s3 sync . s3://stelligent-u-david.merrill.labs --include "file://s3_lab_dir/privatefile.txt" --region us-west-2 --profile labs-mfa --acl public-read
+
+##==== YOU COULD ALSO JUST DELETE THE FILE AND RE-UPLOAD THE FILE AS PRIVATE ====##

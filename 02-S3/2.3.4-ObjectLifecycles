@@ -1,0 +1,7 @@
+##==== CREATE LIFECYCLE POLICY ====##
+aws s3api put-bucket-lifecycle \
+    --bucket stelligent-u-david.merrill.labs \
+    --lifecycle-configuration file://david-merrill-put-bucket-rules.json \
+    --profile labs-mfa
+
+##==== See david-merrill-put-bucket-rules.json file ====##

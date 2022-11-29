@@ -1,0 +1,11 @@
+##===== Make private file ====##
+vi privatefile.txt && chmod 400 privatefile.txtz
+
+##===== upload directory and all it's contents to s3 bucket ====##
+aws s3 cp . s3://stelligent-u-david.merrill.labs --region us-west-2 --profile labs-mfa --recursive
+### This failed to upload file, based on permissions of file
+aws s3 cp . s3://stelligent-u-david.merrill.labs --region us-west-2 --profile labs-mfa --recursive
+aws s3 cp . s3://stelligent-u-david.merrill.labs --exclude "./s3_lab_dir/privatefile.txt" --region us-west-2 --profile labs-mfa --recursive
+
+##===== list contents of s3 bucket ====##
+aws s3 ls s3://stelligent-u-david.merrill.labs --region us-west-2 --profile labs-mfa

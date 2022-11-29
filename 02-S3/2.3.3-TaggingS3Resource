@@ -1,0 +1,6 @@
+##==== TAGGING AN OBJECT IN AN S3 BUCKET ====##
+aws s3api put-object-tagging \
+    --bucket stelligent-u-david.merrill.labs \
+    --key uploadthis.txt \
+    --tagging file://david-merrill-tagging.json
+    --profile labs-mfa

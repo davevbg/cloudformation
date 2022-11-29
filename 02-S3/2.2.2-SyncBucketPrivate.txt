@@ -1,0 +1,7 @@
+##===== update public file private.txt and make it private ====##
+
+aws s3api put-object-acl \
+    --acl private \
+    --bucket stelligent-u-david.merrill.labs \
+    --key s3_lab_dir/privatefile.txt \
+    --profile labs-mfa

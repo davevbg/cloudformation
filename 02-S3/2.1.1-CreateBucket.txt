@@ -1,0 +1,8 @@
+##===== CREATE BUCKET ====##
+aws s3 mb s3://stelligent-u-david.merrill.labs --region us-west-2 --profile labs-mfa
+
+##===== LIST ALL BUCKETS ====##
+aws s3 ls --region us-west-2 --profile labs-mfa
+
+##===== LIST CONTENTS OF stelligent-u-david.merrill.labs BUCKET ====##
+aws s3 ls s3://stelligent-u-david.merrill.labs --region us-west-2 --profile labs-mfa
