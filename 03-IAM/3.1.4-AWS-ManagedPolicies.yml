@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Dave Merrill Update IAM Role with AWS Managed Policy
+
+###====RESOURCES====##
+Resources:
+  Lab3IAMRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      RoleName: "DavidMerrill-ReadOnlyRole"
+      Description: "Role created for lab 3.1.1"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+  Lab3IAMRole2:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      RoleName: "DavidMerrill-ReadOnlyRole-S3-EC2"
+      Description: "This is a second Role created for Lab 3.1.3"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+
+
+Outputs:
+  RoleId1:
+    Description: The logical ID of the IAM role
+    Value: !Ref Lab3IAMRole
+  RoleId2:
+    Description: The logical ID of the IAM role
+    Value: !Ref Lab3IAMRole2
+
+#aws cloudformation update-stack \
+#  --stack-name DavidMerrill-CreateUser-Lab3 \
+#  --template-body file://3.1.4-AWS-ManagedPolicies.yml \
+#  --profile labs-mfa \
+#  --region us-west-2 \
+#  --capabilities CAPABILITY_NAMED_IAM

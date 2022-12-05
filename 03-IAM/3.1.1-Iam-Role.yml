@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Dave Merrill Create IAM Role
+
+###====RESOURCES====##
+Resources:
+  Lab3IAMRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      RoleName: "DavidMerrill-ReadOnlyRole"
+      Policies:
+        - PolicyName: "DavidMerrill-ReadOnlyPolicy"
+          PolicyDocument:
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "DavidMerrillReadOnlyRole",
+                  "Effect": "Allow",
+                  "Action": [
+                    "iam:GenerateCredentialReport",
+                    "iam:GetPolicyVersion",
+                    "iam:GetAccountPasswordPolicy",
+                    "iam:GetServiceLastAccessedDetailsWithEntities",
+                    "iam:GenerateServiceLastAccessedDetails",
+                    "iam:GetServiceLastAccessedDetails",
+                    "iam:GetGroup",
+                    "iam:GetContextKeysForPrincipalPolicy",
+                    "iam:GetServiceLinkedRoleDeletionStatus",
+                    "iam:SimulateCustomPolicy",
+                    "iam:SimulatePrincipalPolicy",
+                    "iam:GetAccountAuthorizationDetails",
+                    "iam:GetCredentialReport",
+                    "iam:GetSAMLProvider",
+                    "iam:GetServerCertificate",
+                    "iam:GetRole",
+                    "iam:GetInstanceProfile",
+                    "iam:GetPolicy",
+                    "iam:GetAccessKeyLastUsed",
+                    "iam:GetSSHPublicKey",
+                    "iam:GetContextKeysForCustomPolicy",
+                    "iam:GetUserPolicy",
+                    "iam:GetGroupPolicy",
+                    "iam:GetUser",
+                    "iam:GetOpenIDConnectProvider",
+                    "iam:GetRolePolicy"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+
+
+# aws cloudformation create-stack \
+#  --stack-name DavidMerrill-CreateUser-Lab3 \
+#  --template-body file://3.1.1-Iam-Role.yml \
+#  --profile labs-mfa \
+#  --region us-west-2 \
+#  --capabilities CAPABILITY_NAMED_IAM
+
+## aws iam list-roles --profile labs-mfa
+## aws iam list-roles --query 'Roles[?RoleName==`DavidMerrill-ReadOnlyRole`]' --profile labs-mfa
+
+

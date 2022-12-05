@@ -1,0 +1,5 @@
+##==== DELETE STACK ====##
+aws cloudformation delete-stack \
+  --stack-name DavidMerrill-CreateUser-Lab3
+  --profile labs-mfa \
+  --region us-west-2

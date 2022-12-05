@@ -27,3 +27,11 @@ Resources:
       Path: '/'
 #      ManagedPolicyArns:
 #        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+
+# aws cloudformation create-stack \
+#  --stack-name DavidMerrill-CreateIAM-User \
+#  --template-body file://lab1.2.1-createIam.yml \
+#  --parameters file://lab1.2-createIAMParameters.json \
+#  --profile temp \
+#  --region us-west-2 \
+#  --capabilities CAPABILITY_NAMED_IAM

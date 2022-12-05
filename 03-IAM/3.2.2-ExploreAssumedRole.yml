@@ -1,0 +1,6 @@
+aws sts assume-role \
+  --role-arn arn:aws:iam::324320755747:role/DavidMerrill-ReadOnlyRole-TrustUser \
+  --role-session-name "RoleSession1" \
+  --profile labs-mfa \
+  --region us-west-2
+  --capabilities CAPABILITY_NAMED_IAM

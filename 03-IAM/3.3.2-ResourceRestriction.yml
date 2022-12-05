@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Dave Merrill Update Two Buckets and a Role
+
+Parameters:
+  1stBucketName:
+    Type: String
+    Default: "david-merrill-lab3-bucket1"
+  2ndBucketName:
+    Type: String
+    Default: "david-merrill-lab3-bucket2"
+
+Resources:
+  ##==== CREATE 1ST BUCKET ====##
+  1stBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Ref 1stBucketName
+  ##==== CREATE 2ND BUCKET ====##
+  2ndBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Ref 2ndBucketName
+  ##==== CREATE S3 FULL ACCESS CUSTOMER MANAGED ROLE ====##
+  Lab3S3FullAccess:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: 'arn:aws:iam::324320755747:user/david.merrill.labs'
+              Service:
+                - s3.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      RoleName: "DavidMerrill-S3FullAccess-Restricted"
+      Description: "Role created for lab 3.3.1"
+#      ManagedPolicyArns:
+#        - !Ref Lab33IAMPolicyDocument
+#        - !Ref Lab33IAMRestrictedPolicyDocument
+
+  Lab33IAMRestrictedPolicyDocument:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy Document for Restricted Access to a Specific S3 bucket
+      Path: /
+      ManagedPolicyName: "DavidMerrill-S3FullAccess-Restricted-Policy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:*'
+            Resource: '*'
+          - Effect: Deny
+            Action:
+              - 's3:Create*'
+              - 's3:Delete*'
+              - 's3:Put*'
+              - 's3:Replicate*'
+              - 's3:Update*'
+            Resource: 'arn:aws:s3:::david-merrill-lab3-bucket2'
+      Roles:
+        - !Ref Lab3S3FullAccess
+
+  Lab33IAMPolicyDocument:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy Document for Read Only S3 Access
+      ManagedPolicyName: "DavidMerrill-S3FullAccess-Policy"
+      Path: /
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:GetObject'
+              - 's3:ListBucket'
+            Resource: '*'
+      Roles:
+        - !Ref Lab3S3FullAccess
+
+
+Outputs:
+  1stBucketName:
+    Description: Name of the main bucket
+    Value: !Ref 1stBucket
+  2ndBucketName:
+    Description: Name of the main bucket
+    Value: !Ref 2ndBucket
+
+
+# aws cloudformation update-stack \
+#  --stack-name DavidMerrill-CreateUser-Lab3-3 \
+#  --template-body file://3.3.2-ResourceRestriction.yml \
+#  --profile labs-mfa \
+#  --region us-west-2 \
+#  --capabilities CAPABILITY_NAMED_IAM

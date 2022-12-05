@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Dave Merrill Update Two Buckets and a Role
+
+Parameters:
+  1stBucketName:
+    Type: String
+    Default: "david-merrill-lab3-bucket1"
+  2ndBucketName:
+    Type: String
+    Default: "david-merrill-lab3-bucket2"
+
+Resources:
+  ##==== CREATE 1ST BUCKET ====##
+  1stBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Ref 1stBucketName
+  ##==== CREATE 2ND BUCKET ====##
+  2ndBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Ref 2ndBucketName
+  ##==== CREATE S3 FULL ACCESS CUSTOMER MANAGED ROLE ====##
+#  Lab3S3FullAccess:
+#    Type: 'AWS::IAM::Role'
+#    Properties:
+#      AssumeRolePolicyDocument:
+#        Version: "2012-10-17"
+#        Statement:
+#          - Effect: Allow
+#            Principal:
+#              AWS: 'arn:aws:iam::324320755747:user/david.merrill.labs'
+#              Service:
+#                - s3.amazonaws.com
+#            Action:
+#              - 'sts:AssumeRole'
+#      Path: /
+#      RoleName: "DavidMerrill-S3FullAccess"
+#      Description: "Role created for lab 3.3.1"
+#      ManagedPolicyArns:
+#        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+Outputs:
+  1stBucketName:
+    Description: Name of the main bucket
+    Value: !Ref 1stBucket
+  2ndBucketName:
+    Description: Name of the main bucket
+    Value: !Ref 2ndBucket
+
+
+# aws cloudformation create-stack \
+#  --stack-name DavidMerrill-CreateUser-Lab3-3 \
+#  --template-body file://3.3.1-UnrestrictedAccess.yml \
+#  --profile labs-mfa \
+#  --region us-west-2 \
+#  --capabilities CAPABILITY_NAMED_IAM

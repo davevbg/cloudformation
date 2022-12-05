@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Dave Merrill test creating policies.
+
+Resources:
+  Lab33IAMRestrictedPolicyDocument:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy Document for Restricted Access to a Specific S3 bucket
+      Path: /
+      ManagedPolicyName: "DavidMerrill-S3FullAccess-Restricted-Policy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:*'
+            Resource: '*'
+          - Effect: Deny
+            Action:
+              - 's3:Create*'
+              - 's3:Delete*'
+              - 's3:Put*'
+              - 's3:Replicate*'
+              - 's3:Update*'
+            Resource: 'arn:aws:s3:::david-merrill-lab3-bucket2'
+
+  Lab33IAMPolicyDocument:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy Document for Read Only S3 Access
+      ManagedPolicyName: "DavidMerrill-S3FullAccess-Policy"
+      Path: /
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:GetObject'
+              - 's3:ListBucket'
+            Resource: '*'
+
+# aws cloudformation create-stack \
+#  --stack-name DavidMerrill-TestCreatePolicy-Lab3-3 \
+#  --template-body file://3.3.2-testPolicies.yml \
+#  --profile labs-mfa \
+#  --region us-west-2 \
+#  --capabilities CAPABILITY_NAMED_IAM

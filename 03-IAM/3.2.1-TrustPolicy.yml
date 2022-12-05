@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Dave Merrill Create IAM Role with Trust Policy
+
+###====RESOURCES====##
+Resources:
+  Lab3IAMRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: 'arn:aws:iam::324320755747:user/davidmerrilllab'
+            Action: 'sts:AssumeRole'
+      Path: /
+      RoleName: "DavidMerrill-ReadOnlyRole-TrustUser"
+      Description: "Role created for lab 3.2.1"
+      ManagedPolicyArns:
+        - arn:aws:iam::324320755747:policy/ReadOnlyPolicy
+
+# aws cloudformation create-stack \
+#  --stack-name DavidMerrill-CreateUser-Lab3-2 \
+#  --template-body file://3.2.1-TrustPolicy.yml \
+#  --profile labs-mfa \
+#  --region us-west-2 \
+#  --capabilities CAPABILITY_NAMED_IAM
+
+aws sts assume-role --role-arn arn:aws:iam::324320755747:role/DavidMerrill-ReadOnlyRole-TrustUser --role-session-name "RoleSession1" --profile labs-mfa
