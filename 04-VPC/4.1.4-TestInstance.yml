@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Dave Merrill Create EC2 Instances
+
+Parameters:
+  ParamInstanceType:
+    Description: WebServer EC2 instance type
+    Type: String
+  ParamKeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: String
+  ParamImageAMI:
+    Description: Linux AMI
+    Type: String
+
+###====RESOURCES====##
+Resources:
+  DavidMerrillsInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !Ref ParamImageAMI
+      KeyName: !Ref ParamKeyName
+      InstanceType: !Ref ParamInstanceType
+      SubnetId: !ImportValue DavidMerrills-VPC-SubnetID
+      Tags:
+        - Key: Name
+          Value: David-Merrill-EC2
+        - Key: user
+          Value: david.merrill.labs
+        - Key: stelligent-u-lesson
+          Value: 04-VPC
+        - Key: stelligent-u-lab
+          Value: 1.4-TestInstance
+
+###====OUTPUT VPC AND SUBNET====##
+Outputs:
+  EC2IDOutput:
+    Description: Output ID of VPC
+    Value: !Ref DavidMerrillsInstance
+    Export:
+      Name: DavidMerrills-EC2ID
+  EC2PrivateIp:
+    Description: Output ID of Subnet
+    Value: !GetAtt DavidMerrillsInstance.PrivateIp
+    Export:
+      Name: DavidMerrills-EC2PrivateIP
+
+
+# aws cloudformation create-stack \
+#  --stack-name DavidMerrill-CreateEC2-Lab4-1 \
+#  --template-body file://4.1.4-TestInstance.yml \
+#  --profile labs-mfa \
+#  --region us-west-2

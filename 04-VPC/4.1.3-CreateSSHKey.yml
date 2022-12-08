@@ -1,0 +1,8 @@
+aws ec2 create-key-pair \
+    --key-name david-merrill-lab4- \
+    --key-type rsa \
+    --key-format pem \
+    --query "KeyMaterial" \
+    --output text > david-merrill-lab4-key.pem \
+    --profile labs-mfa \
+    --region us-west-2

@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "ParamInstanceType",
+    "ParameterValue": "t1.micro"
+  },
+  {
+    "ParameterKey": "ParamKeyName",
+    "ParameterValue": "david-merrill-lab4-key"
+  },
+  {
+    "ParameterKey": "ParamImageAMI",
+    "ParameterValue": "ami-094125af156557ca2"
+  }
+]

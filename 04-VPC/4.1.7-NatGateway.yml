@@ -1,0 +1,118 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Dave Merrill Create VPC and Private Subnet
+
+###====RESOURCES====##
+Resources:
+###====CREATE VPC====##
+  DavidMerrillVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: David-Merrill-VPC
+        - Key: user
+          Value: david.merrill.labs
+        - Key: stelligent-u-lesson
+          Value: 04-VPC
+        - Key: stelligent-u-lab
+          Value: 1.1-CreateNewVPC-PrivateSubnet
+
+###====CREATE PRIVATE SUBNET====##
+  DavidMerrillSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref DavidMerrillVPC
+      CidrBlock: 10.0.0.0/24
+      Tags:
+        - Key: Name
+          Value: David-Merrill-SN
+        - Key: user
+          Value: david.merrill.labs
+        - Key: stelligent-u-lesson
+          Value: 04-VPC
+        - Key: stelligent-u-lab
+          Value: 1.1-CreateNewVPC-PrivateSubnet
+
+###====CREATE INTERNET GATEWAY====##
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: David-Merrill-IG
+
+###====CREATE ATTACH GATEWAY====##
+  AttachGateway:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref DavidMerrillVPC
+      InternetGatewayId: !Ref InternetGateway
+###====CREATE ROUTE TABLE====##
+  RouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref DavidMerrillVPC
+      Tags:
+        - Key: Name
+          Value: David-Merrill-RT
+###====CREATE ROUTE====##
+#  DavidMerrillsRoute:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#       RouteTableId: !Ref RouteTable
+#       DestinationCidrBlock: 0.0.0.0/0
+#       GatewayId: !Ref InternetGateway
+  ###====CREATE ELASTIC IP====##
+  DavidMerrills2ndElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Tags:
+        - Key: Name
+          Value: David-Merrill-EIP-2
+  ###====CREATE NAT GATEWAY====##
+  DavidMerrillNatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt DavidMerrills2ndElasticIP.AllocationId
+      SubnetId: !ImportValue DavidMerrills-VPC-SubnetID
+      Tags:
+        - Key: Name
+          Value: David-Merrill-NG
+  ###====CREATE ROUTE NAT GATEWAY====##
+  DavidMerrillRouteNATGateway:
+    DependsOn: DavidMerrillNatGateway
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !ImportValue DavidMerrills-VPC-RouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref DavidMerrillNatGateway
+
+###====OUTPUT VPC AND SUBNET====##
+Outputs:
+  VPCIDOutput:
+    Description: Output ID of VPC
+    Value: !Ref DavidMerrillVPC
+    Export:
+      Name: DavidMerrills-VPC-ID
+  SubnetIDOutput:
+    Description: Output ID of Subnet
+    Value: !Ref DavidMerrillSubnet
+    Export:
+      Name: DavidMerrills-VPC-SubnetID
+  RouteTableOutput:
+    Description: Output ID of RouteTable
+    Value: !Ref RouteTable
+    Export:
+      Name: DavidMerrills-VPC-RouteTable
+  NatGatewayOutput:
+    Description: Output ID of NatGateway
+    Value: !Ref DavidMerrillNatGateway
+    Export:
+      Name: DavidMerrills-NatGateway
+
+#aws cloudformation update-stack \
+#  --stack-name DavidMerrill-CreateVPC-Lab4-1 \
+#  --template-body file://4.1.7-NatGateway.yml \
+#  --profile labs-mfa \
+#  --region us-west-2

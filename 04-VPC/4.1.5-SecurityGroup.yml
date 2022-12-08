@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Dave Merrill Create EC2 Instances
+
+Parameters:
+  ParamInstanceType:
+    Description: WebServer EC2 instance type
+    Type: String
+  ParamKeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: String
+  ParamImageAMI:
+    Description: Linux AMI
+    Type: String
+
+###====RESOURCES====##
+Resources:
+  ###====CREATE EC2 INSTANCE====##
+  DavidMerrillsInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !Ref ParamImageAMI
+      KeyName: !Ref ParamKeyName
+      InstanceType: !Ref ParamInstanceType
+      SecurityGroupIds:
+        - !Ref DavidMerrillsSecurityGroup
+      SubnetId: !ImportValue DavidMerrills-VPC-SubnetID
+      Tags:
+        - Key: Name
+          Value: David-Merrill-EC2
+        - Key: user
+          Value: david.merrill.labs
+        - Key: stelligent-u-lesson
+          Value: 04-VPC
+        - Key: stelligent-u-lab
+          Value: 1.4-TestInstance
+
+  ###====CREATE SECURITY GROUP====##
+  DavidMerrillsSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId: !ImportValue DavidMerrills-VPC-ID
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: David-Merrill-SC
+        - Key: user
+          Value: david.merrill.labs
+        - Key: stelligent-u-lesson
+          Value: 04-VPC
+        - Key: stelligent-u-lab
+          Value: 1.5-SecurityGroups
+
+
+###====OUTPUT EC2 INFO====##
+Outputs:
+  EC2IDOutput:
+    Description: Output EC2 ID
+    Value: !Ref DavidMerrillsInstance
+    Export:
+      Name: DavidMerrills-EC2ID
+  EC2PrivateIp:
+    Description: Output EC2 Private IP
+    Value: !GetAtt
+      - DavidMerrillsInstance
+      - PrivateIp
+    Export:
+      Name: DavidMerrills-EC2PrivateIP
+  EC2SecurityGroup:
+    Description: Output Security Group IP
+    Value: !Ref DavidMerrillsSecurityGroup
+    Export:
+      Name: DavidMerrills-SecurityGroup
+
+
+
+#aws cloudformation update-stack \
+#--stack-name DavidMerrill-CreateEC2-Lab4-1 \
+#--template-body file://4.1.5-SecurityGroup.yml \
+#--profile labs-mfa \
+#--region us-west-2 \
+#--parameters file://4.1.4-TestInstance-Params.json
+
+# Still can not ping host or ssh to ec2 instance
