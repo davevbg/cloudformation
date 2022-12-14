@@ -1,0 +1,9 @@
+##==== LIST INSTANCES ====##
+aws ec2 describe-instances
+
+##==== DESCRIBE AND FILTER INSTANCES ====##
+aws ec2 describe-instances \
+  --filters "Name=tag-value, Values=David-Merrill-EC2"
+
+##==== DESCRIBE MY INSTANCES ====##
+aws ec2 describe-instances --instance-ids i-0a9c67cc4d992c735

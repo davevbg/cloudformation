@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Dave Merrill Create EC2 Instances
+
+Resources:
+  DavidMerrillUbuntuLT:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        ImageId: ami-0ecc74eca1d66d8a6
+        InstanceType: t2.micro
+        SecurityGroupIds:
+          - sg-085d863a9aac774c2
+      LaunchTemplateName: David-Merrill-CF-LT-Ubuntu
+      VersionDescription: 1.0
+  DavidMerrillWindowsLT:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        ImageId: ami-0c5300e833c2b32f3
+        InstanceType: t2.micro
+        SecurityGroupIds:
+          - sg-085d863a9aac774c2
+      LaunchTemplateName: David-Merrill-CF-LT-Windows
+      VersionDescription: 1.0
+
+  ##====CREATE EC2 INSTANCE====##
+  DavidMerrillsInstanceUbuntu:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DavidMerrillUbuntuLT
+        Version: 1
+      SubnetId: subnet-0907598e0489a5ac7
+      Tags:
+        - Key: Name
+          Value: David-Merrill-EC2-LT-Ubuntu
+        - Key: user
+          Value: david.merrill.labs
+        - Key: stelligent-u-lesson
+          Value: 04-VPC
+        - Key: stelligent-u-lab
+          Value: 1.4-TestInstance
+
+  ##====CREATE EC2 INSTANCE====##
+  DavidMerrillsInstanceWindows:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DavidMerrillWindowsLT
+        Version: 1
+      SubnetId: subnet-0a06bdb836705beaf
+      Tags:
+        - Key: Name
+          Value: David-Merrill-EC2-LT-Windows
+        - Key: user
+          Value: david.merrill.labs
+        - Key: stelligent-u-lesson
+          Value: 04-VPC
+        - Key: stelligent-u-lab
+          Value: 1.4-TestInstance
+
+#aws cloudformation create-stack \
+#  --stack-name DavidMerrill-LaunchTemplate-5 \
+#  --template-body file://5.1.2-Launch-2.yml \
+#  --profile labs-mfa \
+#  --region us-west-2

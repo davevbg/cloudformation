@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Dave Merrill Create EC2 Instances
+
+Resources:
+  DavidMerrillUbuntuLT:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        ImageId: ami-0ecc74eca1d66d8a6
+        InstanceType: t2.micro
+        SecurityGroupIds:
+          - sg-085d863a9aac774c2
+      LaunchTemplateName: David-Merrill-CF-LT-Ubuntu
+      VersionDescription: 1.0
+
+  ##====CREATE EC2 INSTANCE====##
+  DavidMerrillsInstanceUbuntu:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DavidMerrillUbuntuLT
+        Version: 1
+      SubnetId: subnet-0907598e0489a5ac7
+      KeyName: david-merrill-lab5-key
+      Tags:
+        - Key: Name
+          Value: David-Merrill-EC2-LT-Ubuntu
+        - Key: user
+          Value: david.merrill.labs
+        - Key: stelligent-u-lesson
+          Value: 04-VPC
+        - Key: stelligent-u-lab
+          Value: 1.4-TestInstance
+
+  ###====CREATE ELASTIC IP====##
+  DavidMerrillsElasticIPUbuntu:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref DavidMerrillsInstanceUbuntu
+      Tags:
+        - Key: Name
+          Value: David-Merrill-EIP
+        - Key: user
+          Value: david.merrill.labs
+        - Key: stelligent-u-lesson
+          Value: 04-VPC
+        - Key: stelligent-u-lab
+          Value: 1.6-ElasticIP
+
+###====OUTPUT EC2, SECURITY GROUPS, ELASTIC IP====##
+Outputs:
+  EC2IDOutput:
+    Description: Output ID of VPC
+    Value: !Ref DavidMerrillsInstanceUbuntu
+    Export:
+      Name: DavidMerrills-Ubuntu-EC2ID
+  EC2PrivateIp:
+    Description: Output ID of Subnet
+    Value: !GetAtt
+      - DavidMerrillsInstanceUbuntu
+      - PrivateIp
+    Export:
+      Name: DavidMerrills-Ubuntu-EC2PrivateIP
+  EC2ElasticIP:
+    Description: Output ElasticIP Address
+    Value: !Ref DavidMerrillsElasticIPUbuntu
+    Export:
+      Name: DavidMerrills-Ubuntu-ElasticIP
+
+#aws cloudformation create-stack \
+#  --stack-name DavidMerrill-LaunchTemplate-5-2 \
+#  --template-body file://5.2.1-ElasticIP.yml \
+#  --profile labs-mfa \
+#  --region us-west-2

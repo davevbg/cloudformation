@@ -3,7 +3,7 @@ Description: Dave Merrill Create VPC and Private Subnet
 
 ###====RESOURCES====##
 Resources:
-###====CREATE VPC====##
+  ##====CREATE VPC====##
   DavidMerrillVPC:
     Type: 'AWS::EC2::VPC'
     Properties:
@@ -18,7 +18,7 @@ Resources:
         - Key: stelligent-u-lab
           Value: 1.1-CreateNewVPC-PrivateSubnet
 
-###====CREATE PRIVATE SUBNET====##
+  ##====CREATE PRIVATE SUBNET====##
   DavidMerrillSubnet:
     Type: 'AWS::EC2::Subnet'
     Properties:
@@ -34,7 +34,7 @@ Resources:
         - Key: stelligent-u-lab
           Value: 1.1-CreateNewVPC-PrivateSubnet
 
-###====CREATE INTERNET GATEWAY====##
+  ##====CREATE INTERNET GATEWAY====##
   InternetGateway:
     Type: 'AWS::EC2::InternetGateway'
     Properties:
@@ -42,14 +42,14 @@ Resources:
         - Key: Name
           Value: David-Merrill-IG
 
-###====CREATE ATTACH GATEWAY====##
+  ##====CREATE ATTACH GATEWAY====##
   AttachGateway:
     Type: 'AWS::EC2::VPCGatewayAttachment'
     Properties:
       VpcId: !Ref DavidMerrillVPC
       InternetGatewayId: !Ref InternetGateway
 
-###====CREATE ROUTE TABLE====##
+  ##====CREATE ROUTE TABLE====##
   RouteTable:
     Type: 'AWS::EC2::RouteTable'
     Properties:
@@ -57,7 +57,7 @@ Resources:
       Tags:
         - Key: Name
           Value: David-Merrill-RT
-###====CREATE ROUTE====##
+  ##====CREATE ROUTE====##
   RouteTable:
     Type: 'AWS::EC2::Route'
     Properties:
