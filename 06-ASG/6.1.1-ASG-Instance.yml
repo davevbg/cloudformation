@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Dave Merrill Create EC2 Instances
+
+Resources:
+  DavidMerrillDebianLT:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        ImageId: ami-0b8db56f1634f78b5
+        InstanceType: t2.micro
+        SecurityGroupIds:
+          - sg-085d863a9aac774c2
+      LaunchTemplateName: David-Merrill-CF-LT-Debian
+      VersionDescription: 1.0
+
+  ##====CREATE EC2 INSTANCE====##
+  DavidMerrillsInstanceDebian:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DavidMerrillDebianLT
+        Version: 1
+      SubnetId: subnet-0907598e0489a5ac7
+      KeyName: david-merrill-manual-key
+      Tags:
+        - Key: Name
+          Value: David-Merrill-EC2-LT-Debian
+
+  ###====CREATE ELASTIC IP====##
+  DavidMerrillsElasticIPDebian:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref DavidMerrillsInstanceDebian
+      Tags:
+        - Key: Name
+          Value: David-Merrill-EIP-Debian
+
+###====OUTPUT EC2, SECURITY GROUPS, ELASTIC IP====##
+Outputs:
+  EC2IDOutput:
+    Description: Output ID of VPC
+    Value: !Ref DavidMerrillsInstanceDebian
+    Export:
+      Name: DavidMerrills-Debian-EC2ID
+  EC2PrivateIp:
+    Description: Output ID of Subnet
+    Value: !GetAtt
+      - DavidMerrillsInstanceDebian
+      - PrivateIp
+    Export:
+      Name: DavidMerrills-Debian-EC2PrivateIP
+  EC2ElasticIP:
+    Description: Output ElasticIP Address
+    Value: !Ref DavidMerrillsElasticIPDebian
+    Export:
+      Name: DavidMerrills-Debian-ElasticIP
+
+##=== AWS STACK CREATION CLI ====##
+#aws cloudformation create-stack \
+#  --stack-name DavidMerrill-LaunchTemplate-6-1 \
+#  --template-body file://6.1.1-ASG-Instance.yml \
+#  --profile labs-mfa \
+#  --region us-west-2
+
+##==== ASG CLI COMMAND ====##
+aws autoscaling create-auto-scaling-group \
+  --auto-scaling-group-name DavidMerrill-ASG-Lab6 \
+  --launch-template LaunchTemplateId=lt-07c3b93e5db03e05d \
+  --min-size 1 \
+  --max-size 1 \
+  --desired-capacity 1 \
+  --vpc-zone-identifier "subnet-0907598e0489a5ac7,subnet-0a06bdb836705beaf" \
+  --profile labs-mfa \
+  --region us-west-2

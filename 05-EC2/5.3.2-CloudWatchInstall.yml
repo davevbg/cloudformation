@@ -6,7 +6,7 @@ Resources:
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateData:
-        ImageId: ami-0ecc74eca1d66d8a6
+        ImageId: ami-037a129feabd05887
         InstanceType: t2.micro
         SecurityGroupIds:
           - sg-085d863a9aac774c2
@@ -93,40 +93,40 @@ Resources:
         - Key: Name
           Value: David-Merrill-EC2-CloudWatch
       UserData:
-        # This script below is to install AmazonCloudWatchAgent, restart AmazonCloudWatchAgent and tell the result to cloudformation.
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          curl -o /tmp/amazon-cloudwatch-agent.deb https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
-          dpkg -i -E /tmp/amazon-cloudwatch-agent.deb
-          amazon-cloudwatch-agent-ctl -a start
         Fn::Base64:
           Fn::Join:
           - ''
           - - "#!/bin/bash -xe\n"
-            - 'apt-get update -y
-              '
-            - "\n"
             - 'mkdir -p /opt/aws/bin
               '
             - "\n"
             - 'wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
               '
             - "\n"
-            - 'python3 -m easy_install --script-dir /opt/aws/bin aws-cfn-bootstrap-py3-latest.tar.gz
+            - 'mv /aws-cfn-bootstrap-py3-latest.tar.gz /opt/aws/bin/
               '
             - "\n"
-            - "/opt/aws/bin/cfn-init -v "
+            - 'tar -xzvf /opt/aws/bin/aws-cfn-bootstrap-py3-latest.tar.gz -C /opt/aws/bin/
+              '
+            - "\n"
+            - 'chmod +x /opt/aws/bin/aws-cfn-bootstrap-2.0/bin/cfn-init /opt/aws/bin/aws-cfn-bootstrap-2.0/bin/cfn-signal
+              '
+            - "\n"
+            - 'cp -R /opt/aws/bin/aws-cfn-bootstrap-2.0/cfnbootstrap /usr/lib/python3.8/
+              '
+            - "\n"
+            - "/opt/aws/bin/aws-cfn-bootstrap-2.0/bin/cfn-init -v "
             - "         --stack "
             - Ref: AWS::StackName
-            - "         --resource LinuxInstance "
+            - "         --resource DavidMerrillsInstanceCloudWatch"
             - "         --configsets full_install "
             - "         --region "
             - Ref: AWS::Region
             - "\n"
-            - "/opt/aws/bin/cfn-signal -e $? "
+            - "/opt/aws/bin/aws-cfn-bootstrap-2.0/bin/cfn-signal -e $? "
             - "         --stack "
             - Ref: AWS::StackName
-            - "         --resource LinuxInstance "
+            - "         --resource DavidMerrillsInstanceCloudWatch"
             - "         --region "
             - Ref: AWS::Region
             - "\n"
@@ -170,31 +170,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
 
-#  PolicyForCloudWatch:
-#    Type: "AWS::IAM::Policy"
-#    Properties:
-#      PolicyName: "Cloudwatchinlineforlab5"
-#      PolicyDocument:
-#        Version: '2012-10-17'
-#        Statement:
-#          - Effect: Allow
-#            Action:
-#              - cloudwatch:PutMetricData
-#              - ec2:DescribeVolumes
-#              - ec2:DescribeTags
-#              - logs:PutLogEvents
-#              - logs:DescribeLogStreams
-#              - logs:DescribeLogGroups
-#              - logs:CreateLogStream
-#              - logs:CreateLogGroup
-#            Resource: "*"
-#          - Effect: Allow
-#            Action:
-#              - ssm:GetParameter
-#            Resource: arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*
-#      Roles:
-#        - Ref: "DavidMerrillsCloudWatchRole"
-
 ###====OUTPUT EC2, SECURITY GROUPS, ELASTIC IP====##
 #Outputs:
 #  EC2IDOutput:
@@ -217,7 +192,7 @@ Resources:
 
 #aws cloudformation create-stack \
 #  --stack-name DavidMerrill-CloudWatch-Install-5-3 \
-#  --template-body file://5.3.2-CloudWatchInstall.yml \
+#  --template-body file://~/sites/stelligent_labs/05-EC2/5.3.2-CloudWatchInstall.yml \
 #  --profile labs-mfa \
 #  --region us-west-2 \
 #  --capabilities CAPABILITY_NAMED_IAM

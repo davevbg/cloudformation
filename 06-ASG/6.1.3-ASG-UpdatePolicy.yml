@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Dave Merrill Create EC2 Instances
+
+Parameters:
+  LaunchTemplateVersionNumber:
+    Default: 1
+    Type: String
+
+Resources:
+  ##==== CREATE DEBIAN EC2 LAUNCH TEMPLATE ====##
+  DavidMerrillDebianLT:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: David-Merrill-CF-LT-Debian-6-1
+      VersionDescription: !Ref LaunchTemplateVersionNumber
+      LaunchTemplateData:
+        ImageId: ami-0b8db56f1634f78b5
+        InstanceType: t2.micro
+        KeyName: david-merrill-manual-key
+        SecurityGroupIds:
+          - sg-085d863a9aac774c2
+        UserData:
+          Fn::Base64:
+            !Sub | 
+            #!/bin/bash
+            apt update && sudo apt upgrade -y
+            apt install apache2 -y
+            systemctl restart apache2
+
+  ##====CREATE EC2 INSTANCE====##
+  DavidMerrillsInstanceDebian:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DavidMerrillDebianLT
+        Version: !Ref LaunchTemplateVersionNumber
+      SubnetId: subnet-0907598e0489a5ac7
+      Tags:
+        - Key: Name
+          Value: David-Merrill-ASG-Debian
+
+  ###====CREATE ELASTIC IP====##
+  DavidMerrillsElasticIPDebian:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref DavidMerrillsInstanceDebian
+      Tags:
+        - Key: Name
+          Value: David-Merrill-ASG-EIP-Debian
+
+  ###====CREATE AUTOSCALING GROUP====##
+  DavidMerrillsAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      MinSize: '2'
+      MaxSize: '5'
+      DesiredCapacity: '3'
+      AutoScalingGroupName: David-Merrill-ASG-Debian
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DavidMerrillDebianLT
+        Version: !Ref LaunchTemplateVersionNumber
+      VPCZoneIdentifier:
+        - subnet-0907598e0489a5ac7
+        - subnet-0a06bdb836705beaf
+      Tags:
+        - Key: Name
+          Value: David-Merrill-ASG-Debian
+
+###====OUTPUT EC2, SECURITY GROUPS, ELASTIC IP====##
+Outputs:
+  EC2IDOutput:
+    Description: Output ID of VPC
+    Value: !Ref DavidMerrillsInstanceDebian
+    Export:
+      Name: DavidMerrills-ASG-Debian-EC2ID
+
+##=== AWS STACK CREATION CLI ====##
+#aws cloudformation update-stack \
+#  --stack-name DavidMerrill-LaunchTemplate-6-1 \
+#  --template-body file://~/sites/stelligent_labs/06-ASG/6.1.3-ASG-UpdatePolicy.yml \
+#  --profile labs-mfa \
+#  --region us-west-2
