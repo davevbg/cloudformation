@@ -1,0 +1,8 @@
+##==== AUTOSCALING SET INSTANCE UNHEALTHY ====##
+aws autoscaling set-instance-health \
+  --instance-id i-0e99bb16e957c89f7 \
+  --health-status Unhealthy \
+  --profile labs-mfa \
+  --region us-west-2
+
+## Terminated UnHealthy Instance and then Spun up a new instance in its place

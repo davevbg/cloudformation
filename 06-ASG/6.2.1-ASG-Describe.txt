@@ -1,0 +1,41 @@
+##==== DESCRIBE STACK RESOURCES BY STACK NAME ====##
+aws cloudformation describe-stack-resources \
+  --profile labs-mfa \
+  --region us-west-2 \
+  --stack-name DavidMerrill-LaunchTemplate-5-2
+
+##==== DESCRIBE STACK RESOURCES QUERY BY LOGICALRESOURCEID DISPLAY RESOURCE TYPE ====##
+aws cloudformation describe-stack-resources \
+  --profile labs-mfa \
+  --region us-west-2 \
+  --stack-name DavidMerrill-LaunchTemplate-6-1 \
+  --query "StackResources[?LogicalResourceId=='DavidMerrillAmazonLinuxLT'] | [*].ResourceType"
+
+
+
+{
+    "StackResources": [
+        {
+            "StackName": "DavidMerrill-LaunchTemplate-6-1",
+            "StackId": "arn:aws:cloudformation:us-west-2:324320755747:stack/DavidMerrill-LaunchTemplate-6-1/9fb49470-800f-11ed-9f76-0a9f385fe065",
+            "LogicalResourceId": "DavidMerrillAmazonLinuxLT",
+            "PhysicalResourceId": "lt-00980b8319dd2a4ef",
+            "ResourceType": "AWS::EC2::LaunchTemplate",
+            "Timestamp": "2022-12-20T02:40:21.146000+00:00",
+            "ResourceStatus": "CREATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "NOT_CHECKED"
+            }
+        },
+        {
+            "StackName": "DavidMerrill-LaunchTemplate-6-1",
+            "StackId": "arn:aws:cloudformation:us-west-2:324320755747:stack/DavidMerrill-LaunchTemplate-6-1/9fb49470-800f-11ed-9f76-0a9f385fe065",
+            "LogicalResourceId": "DavidMerrillsAutoScalingGroup",
+            "PhysicalResourceId": "David-Merrill-ASG-AmazonLinux",
+            "ResourceType": "AWS::AutoScaling::AutoScalingGroup",
+            "Timestamp": "2022-12-20T02:41:18.289000+00:00",
+            "ResourceStatus": "CREATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "NOT_CHECKED"
+            }
+        },

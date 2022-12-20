@@ -7,72 +7,71 @@ Parameters:
     Type: String
 
 Resources:
-  ##==== CREATE DEBIAN EC2 LAUNCH TEMPLATE ====##
-  DavidMerrillDebianLT:
+  ##==== CREATE AmazonLinux EC2 LAUNCH TEMPLATE ====##
+  DavidMerrillAmazonLinuxLT:
     Type: AWS::EC2::LaunchTemplate
     Properties:
-      LaunchTemplateName: David-Merrill-CF-LT-Debian-6-2
+      LaunchTemplateName: David-Merrill-CF-LT-AmazonLinux-6-1
       VersionDescription: !Ref LaunchTemplateVersionNumber
       LaunchTemplateData:
         ImageId: ami-0ceecbb0f30a902a6
-        InstanceType: t2.micro
+        InstanceType: t2.small
         KeyName: david-merrill-manual-key
         SecurityGroupIds:
           - sg-085d863a9aac774c2
-        UserData:
-          Fn::Base64:
-            !Sub | 
-            #!/bin/bash
-            apt update && sudo apt upgrade -y
-            apt install apache2 -y
-            systemctl restart apache2
 
   ##====CREATE EC2 INSTANCE====##
-  DavidMerrillsInstanceDebian:
+  DavidMerrillsInstanceAmazonLinux:
     Type: 'AWS::EC2::Instance'
     Properties:
       LaunchTemplate:
-        LaunchTemplateId: !Ref DavidMerrillDebianLT
+        LaunchTemplateId: !Ref DavidMerrillAmazonLinuxLT
         Version: !Ref LaunchTemplateVersionNumber
       SubnetId: subnet-0907598e0489a5ac7
+      InstanceType: t2.micro
       Tags:
         - Key: Name
-          Value: David-Merrill-ASG-LT-Debian
+          Value: David-Merrill-ASG-AmazonLinux
 
   ###====CREATE ELASTIC IP====##
-  DavidMerrillsElasticIPDebian:
+  DavidMerrillsElasticIPAmazonLinux:
     Type: AWS::EC2::EIP
     Properties:
-      InstanceId: !Ref DavidMerrillsInstanceDebian
+      InstanceId: !Ref DavidMerrillsInstanceAmazonLinux
       Tags:
         - Key: Name
-          Value: David-Merrill-ASG-EIP-Debian
+          Value: David-Merrill-ASG-EIP-AmazonLinux
 
   ###====CREATE AUTOSCALING GROUP====##
   DavidMerrillsAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
-      MinSize: '2'
-      MaxSize: '5'
-      DesiredCapacity: '3'
+      MinSize: '1'
+      MaxSize: '3'
+      DesiredCapacity: '2'
       LaunchTemplate:
-        LaunchTemplateId: !Ref DavidMerrillDebianLT
+        LaunchTemplateId: !Ref DavidMerrillAmazonLinuxLT
         Version: !Ref LaunchTemplateVersionNumber
       VPCZoneIdentifier:
         - subnet-0907598e0489a5ac7
         - subnet-0a06bdb836705beaf
+      Tags:
+        - Key: Name
+          Value: David-Merrill-ASG-AmazonLinux
+          PropagateAtLaunch: true
+      AutoScalingGroupName: David-Merrill-ASG-AmazonLinux
 
 ###====OUTPUT EC2, SECURITY GROUPS, ELASTIC IP====##
 Outputs:
   EC2IDOutput:
     Description: Output ID of VPC
-    Value: !Ref DavidMerrillsInstanceDebian
+    Value: !Ref DavidMerrillsInstanceAmazonLinux
     Export:
-      Name: DavidMerrills-ASG-Debian-EC2ID
+      Name: DavidMerrills-ASG-AmazonLinux-EC2ID
 
 ##=== AWS STACK CREATION CLI ====##
 #aws cloudformation create-stack \
 #  --stack-name DavidMerrill-LaunchTemplate-6-1 \
-#  --template-body file://6.1.2-ASG-LaunchConfig.yml \
+#  --template-body file://6.1.3-ASG-LaunchChanges.yml \
 #  --profile labs-mfa \
 #  --region us-west-2

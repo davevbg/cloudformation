@@ -1,0 +1,20 @@
+##==== AUTOSCALING DESCRIBE INSTANCE ====##
+aws autoscaling describe-auto-scaling-instances \
+  --instance-ids i-08ca162aa79317d04 \
+  --profile labs-mfa \
+  --region us-west-2
+
+##==== AUTOSCALING REMOVE INSTANCE BY STANDBY
+aws autoscaling enter-standby \
+  --instance-ids i-08ca162aa79317d04 \
+  --auto-scaling-group-name David-Merrill-ASG-AmazonLinux \
+  --should-decrement-desired-capacity \
+  --profile labs-mfa \
+  --region us-west-2
+
+##==== PUT THE INSTANCE BACK IN SERVICE ====##
+aws autoscaling exit-standby \
+  --instance-ids i-08ca162aa79317d04 \
+  --auto-scaling-group-name David-Merrill-ASG-AmazonLinux \
+  --profile labs-mfa \
+  --region us-west-2

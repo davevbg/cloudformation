@@ -49,7 +49,7 @@ Resources:
                   - 'action=/opt/aws/bin/cfn-init -v '
                   - "         --stack "
                   - Ref: AWS::StackName
-                  - "         --resource EC2Instance "
+                  - "         --resource DavidMerrillsInstanceCloudWatch "
                   - "         --configsets full_install "
                   - "         --region "
                   - Ref: AWS::Region

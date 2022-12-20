@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Dave Merrill Create EC2 Instances
+
+Resources:
+  ##==== CREATE AmazonLinux EC2 LAUNCH TEMPLATE ====##
+  DavidMerrillAmazonLinuxLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-0ceecbb0f30a902a6
+      InstanceType: t2.medium
+      KeyName: david-merrill-manual-key
+      SecurityGroups: [ "sg-085d863a9aac774c2" ]
+      LaunchConfigurationName: David-Merrill-ASG-LaunchConfiguration
+
+  ###====CREATE AUTOSCALING GROUP====##
+  DavidMerrillAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      MinSize: '1'
+      MaxSize: '1'
+      DesiredCapacity: '1'
+      LaunchConfigurationName: !Ref DavidMerrillAmazonLinuxLaunchConfig
+      VPCZoneIdentifier:
+        - subnet-0907598e0489a5ac7
+        - subnet-0a06bdb836705beaf
+      Tags:
+        - Key: Name
+          Value: David-Merrill-ASG-AmazonLinux
+          PropagateAtLaunch: true
+      AutoScalingGroupName: David-Merrill-ASG-LaunchConfiguration
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: 'true'
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+
+###====OUTPUT EC2, SECURITY GROUPS, ELASTIC IP====##
+
+
+##=== AWS STACK CREATION CLI ====##
+#aws cloudformation create-stack \
+#  --stack-name DavidMerrill-LaunchConfiguration-6-1-5 \
+#  --template-body file://~/sites/stelligent_labs/06-ASG/6.1.5-ASG-LaunchTemplate.yml \
+#  --profile labs-mfa \
+#  --region us-west-2
