@@ -1,0 +1,175 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "Create ALB, target groups Auto Scaling Group"
+
+Parameters:
+  VPC:
+    Type: AWS::EC2::VPC::Id
+    Description: The vpc to launch the service
+    Default: vpc-08d0e2cb8d752ef75
+
+  PublicSubnet1Param:
+    Type: String
+    Description: The subnet where to launch the service
+    Default: subnet-0907598e0489a5ac7
+
+  PublicSubnet2Param:
+    Type: String
+    Description: the subnet where to Launch the service
+    Default: subnet-0a06bdb836705beaf
+
+  SecurityGroupParam:
+    Type: String
+    Description: The Security Group to Launch the sevice
+    Default: sg-085d863a9aac774c2
+
+Resources:
+
+  ApplicationLoadBalancer:
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties:
+      Name: "lab7-Application-Load-Balancer"
+      Scheme: "internet-facing"
+      Type: "application"
+      Subnets:
+        - !Ref PublicSubnet1Param
+        - !Ref PublicSubnet2Param
+      SecurityGroups:
+        - !Ref SecurityGroupParam
+      IpAddressType: "ipv4"
+      LoadBalancerAttributes:
+        - Key: "access_logs.s3.enabled"
+          Value: "false"
+        - Key: "idle_timeout.timeout_seconds"
+          Value: "60"
+        - Key: "deletion_protection.enabled"
+          Value: "false"
+        - Key: "routing.http2.enabled"
+          Value: "true"
+        - Key: "routing.http.drop_invalid_header_fields.enabled"
+          Value: "false"
+
+  HTTPListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: "HTTP"
+      DefaultActions:
+        - Order: 1
+          TargetGroupArn: !Ref TargetGroup1
+          Type: "forward"
+
+  TargetGroup1:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: "/index.html"
+      Port: 80
+      Protocol: "HTTP"
+      HealthCheckPort: "traffic-port"
+      HealthCheckProtocol: "HTTP"
+      HealthCheckTimeoutSeconds: 5
+      UnhealthyThresholdCount: 2
+      TargetType: "instance"
+      Matcher:
+        HttpCode: "200"
+      HealthyThresholdCount: 5
+      VpcId: !Ref VPC
+      Name: "target-group-1"
+      HealthCheckEnabled: true
+      TargetGroupAttributes:
+        - Key: "stickiness.enabled"
+          Value: "false"
+        - Key: "deregistration_delay.timeout_seconds"
+          Value: "300"
+        - Key: "stickiness.type"
+          Value: "lb_cookie"
+        - Key: "stickiness.lb_cookie.duration_seconds"
+          Value: "86400"
+        - Key: "slow_start.duration_seconds"
+          Value: "0"
+        - Key: "load_balancing.algorithm.type"
+          Value: "round_robin"
+
+  WebServerAsg:
+    Type: 'AWS::AutoScaling::AutoScalingGroup'
+    Properties:
+      AutoScalingGroupName: 'AutomationBoxes'
+      VPCZoneIdentifier:
+        - !Ref PublicSubnet1Param # Find public subnets within the default VPC or
+        - !Ref PublicSubnet2Param
+      DesiredCapacity: '3'
+      HealthCheckType: 'ELB'
+      HealthCheckGracePeriod: 30
+      LaunchConfigurationName: !Ref WebServersLC
+      MaxSize: '3'
+      MinSize: '3'
+      TargetGroupARNs:
+        - !Ref TargetGroup1
+      Tags:
+        - Key: Name
+          Value: David-Merrill-Lab7-Instances
+          PropagateAtLaunch: true
+
+  WebServersLC:
+    Type: 'AWS::AutoScaling::LaunchConfiguration'
+    Properties:
+      ImageId: 'ami-0ceecbb0f30a902a6'
+#      ImageId: 'ami-0e4841c3bb7d47d69' ##== Centos Nginx Box ==##
+      InstanceType: 't2.micro'
+      LaunchConfigurationName: 'SimpleWebServerLC'
+      KeyName: david-merrill-manual-key
+      SecurityGroups:
+        - !Ref SecurityGroupParam
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/bash -xe
+            sudo yum update -y
+            sudo amazon-linux-extras install nginx1 -y 
+            sudo systemctl enable nginx
+            sudo systemctl start nginx            
+
+            yum install -y aws-cfn-bootstrap
+
+            # Install the files and packages from the metadata
+            /opt/aws/bin/cfn-init -v \
+              --stack ${AWS::StackName} \
+              --resource WebServersLC \
+              --configsets All \
+              --region ${AWS::Region}
+
+            # Signal the status from cfn-init
+            /opt/aws/bin/cfn-signal -e $? \
+              --stack ${AWS::StackName} \
+              --resource WebServersLC \
+              --region ${AWS::Region}
+
+    Metadata:
+      'AWS::CloudFormation::Init':
+        configSets:
+          All:
+            - ConfigureStelligentProject
+        ConfigureStelligentProject:
+          packages:
+            yum:
+              nginx: []
+          files:
+            /usr/share/nginx/html/index.html:
+              content: '<p>Automation for the People</p>'
+              mode: '000644'
+              owner: root
+              group: root
+          services:
+            sysvinit:
+              nginx:
+                enabled: 'true'
+                ensureRunning: 'true'
+
+
+##=== AWS STACK CREATION CLI ====##
+#aws cloudformation create-stack \
+#  --stack-name DavidMerrill-LaunchTemplate-7-1 \
+#  --template-body file://7.1.1-LB-ASGBasics.yml \
+#  --profile labs-mfa \
+#  --region us-west-2
